@@ -13,6 +13,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+
+/**
+ * DTO used when creating a new product. Fields marked with validation
+ * annotations are required for creation.
+ */
 public class ProductCreateDto {
 
     @NotBlank

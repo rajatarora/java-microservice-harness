@@ -17,10 +17,18 @@ import org.springframework.web.context.request.WebRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Centralized exception handler that maps common exceptions to JSON HTTP
+ * responses with appropriate status codes and helpful details.
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Handle JPA {@link EntityNotFoundException} and return 404 with a body
+     * containing a timestamp, status, error and message.
+     */
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleNotFound(EntityNotFoundException ex, WebRequest request) {
         log.warn("Entity not found: {} | request={}", ex.getMessage(), request.getDescription(false));
@@ -32,6 +40,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Handle request body validation failures raised by Spring MVC and return
+     * a 400 response containing a list of field error messages.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidation(MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
@@ -46,12 +58,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Overload used by tests and direct calls to map constraint violations to a
+     * bad request response.
+     */
     @ExceptionHandler(ConstraintViolationException.class)
-    // Keep a non-annotated overload for direct test calls that pass only the exception
     public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex) {
         return handleConstraintViolation(ex, null);
     }
 
+    /**
+     * Handle {@link ConstraintViolationException} produced by parameter or
+     * other validation and return a 400 containing the violation messages.
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
@@ -66,6 +85,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Fallback handler for unanticipated exceptions. Returns a 500 response
+     * with the exception message and a timestamp.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();

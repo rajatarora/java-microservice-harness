@@ -11,6 +11,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+
+/**
+ * DTO used for partial updates to a product. All fields are optional and
+ * only provided values should be applied.
+ */
 public class ProductUpdateDto {
 
     private String name;

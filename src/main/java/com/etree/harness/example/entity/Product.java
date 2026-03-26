@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
 
+/**
+ * JPA entity representing a product in the sample domain.
+ */
 @Entity
 @Table(name = "products")
 @Getter

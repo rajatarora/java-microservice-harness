@@ -13,10 +13,19 @@ public class ProductMapperImpl implements ProductMapper {
 
     private final ModelMapper modelMapper;
 
+    /**
+     * Create a new mapper instance.
+     *
+     * @param modelMapper configured ModelMapper bean
+     */
     public ProductMapperImpl(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 
+    /**
+     * Convert a create DTO into a `Product` entity. Returns null when the DTO
+     * is null.
+     */
     @Override
     public Product toEntity(ProductCreateDto dto) {
         if (dto == null) {
@@ -25,6 +34,10 @@ public class ProductMapperImpl implements ProductMapper {
         return modelMapper.map(dto, Product.class);
     }
 
+    /**
+     * Update an existing entity from the update DTO. This performs in-place
+     * mapping and is a no-op if either argument is null.
+     */
     @Override
     public void updateFromDto(ProductUpdateDto dto, Product entity) {
         if (dto == null || entity == null) {
@@ -33,6 +46,10 @@ public class ProductMapperImpl implements ProductMapper {
         modelMapper.map(dto, entity);
     }
 
+    /**
+     * Map a `Product` entity to a response DTO. Returns null when the entity
+     * is null.
+     */
     @Override
     public ProductResponseDto toDto(Product entity) {
         if (entity == null) {

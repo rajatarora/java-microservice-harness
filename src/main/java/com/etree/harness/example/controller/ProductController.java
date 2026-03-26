@@ -25,6 +25,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * REST controller exposing CRUD endpoints for `Product` resources.
+ */
 @RestController
 @Slf4j
 @RequestMapping("/api/v1/products")
@@ -33,12 +36,23 @@ public class ProductController {
 
     private final ProductService service;
 
+    /**
+     * Create a new controller instance.
+     *
+     * @param service product service implementation
+     */
     public ProductController(ProductService service) {
         this.service = service;
     }
 
     @PostMapping
     @Operation(summary = "Create a product")
+    /**
+     * Create a new product.
+     *
+     * @param dto product create DTO
+     * @return created product response with location header
+     */
     public ResponseEntity<ProductResponseDto> create(@Valid @RequestBody ProductCreateDto dto) {
         log.info("Create product request received: name={} price={}", dto.getName(), dto.getPrice());
         ProductResponseDto created = service.create(dto);
@@ -48,6 +62,12 @@ public class ProductController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a product by id")
+    /**
+     * Retrieve a product by id.
+     *
+     * @param id product id
+     * @return product response DTO
+     */
     public ResponseEntity<ProductResponseDto> getById(@PathVariable Long id) {
         log.debug("Get product by id request: id={}", id);
         ProductResponseDto resp = service.getById(id);
@@ -57,6 +77,11 @@ public class ProductController {
 
     @GetMapping
     @Operation(summary = "List all products")
+    /**
+     * List all products.
+     *
+     * @return list of product response DTOs
+     */
     public ResponseEntity<List<ProductResponseDto>> getAll() {
         log.debug("Get all products request");
         var list = service.getAll();
@@ -66,6 +91,13 @@ public class ProductController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Replace a product")
+    /**
+     * Replace (full update) a product identified by id.
+     *
+     * @param id  product id
+     * @param dto create DTO used as replacement
+     * @return updated product response
+     */
     public ResponseEntity<ProductResponseDto> replace(@PathVariable Long id, @Valid @RequestBody ProductCreateDto dto) {
         // Treat PUT as full replace: map create DTO to update DTO
         ProductUpdateDto update = new ProductUpdateDto();
@@ -81,6 +113,13 @@ public class ProductController {
 
     @PatchMapping("/{id}")
     @Operation(summary = "Partially update a product")
+    /**
+     * Partially update a product.
+     *
+     * @param id  product id
+     * @param dto update DTO with optional fields
+     * @return updated product response
+     */
     public ResponseEntity<ProductResponseDto> patch(@PathVariable Long id, @Valid @RequestBody ProductUpdateDto dto) {
         log.info("Patch product request: id={} fields={}", id, dto);
         ProductResponseDto updated = service.update(id, dto);
@@ -90,6 +129,12 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a product")
+    /**
+     * Delete a product by id.
+     *
+     * @param id product id to delete
+     * @return 204 No Content on success
+     */
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         log.info("Delete product request: id={}", id);
         service.delete(id);

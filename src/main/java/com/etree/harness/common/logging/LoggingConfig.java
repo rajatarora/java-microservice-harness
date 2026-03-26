@@ -7,6 +7,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class LoggingConfig {
 
+    /**
+     * Registers the {@link CorrelationIdFilter} so it runs early in the filter
+     * chain for all incoming requests.
+     *
+     * @param filter the correlation id filter bean
+     * @return a configured filter registration
+     */
     @Bean
     public FilterRegistrationBean<CorrelationIdFilter> correlationIdFilterRegistration(CorrelationIdFilter filter) {
         FilterRegistrationBean<CorrelationIdFilter> reg = new FilterRegistrationBean<>();

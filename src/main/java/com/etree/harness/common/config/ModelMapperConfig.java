@@ -8,6 +8,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ModelMapperConfig {
 
+    /**
+     * Provide a `ModelMapper` configured to only copy non-null properties.
+     *
+     * @return configured ModelMapper bean
+     */
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();

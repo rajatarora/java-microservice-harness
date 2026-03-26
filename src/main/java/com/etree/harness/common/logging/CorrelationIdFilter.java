@@ -19,6 +19,14 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
     public static final String REQUEST_ID = "requestId";
     public static final String TRACE_ID = "traceId";
 
+    /**
+     * Ensures each request has a request id and copies relevant trace headers
+     * into the SLF4J Mapped Diagnostic Context (MDC) so they appear in logs.
+     *
+     * <p>This method will generate a UUID when the incoming request does not
+     * contain an `X-Request-Id` header and will attempt to copy common tracing
+     * headers such as `traceparent` and `X-B3-TraceId` into the MDC.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

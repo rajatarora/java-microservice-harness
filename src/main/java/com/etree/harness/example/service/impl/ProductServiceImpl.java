@@ -17,6 +17,10 @@ import com.etree.harness.example.service.ProductService;
 
 import jakarta.persistence.EntityNotFoundException;
 
+/**
+ * Default `ProductService` implementation containing business logic for
+ * creating, retrieving, updating and deleting products.
+ */
 @Service
 @Transactional
 @Slf4j
@@ -25,11 +29,20 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository repository;
     private final ProductMapper mapper;
 
+    /**
+     * Construct the service with required dependencies.
+     *
+     * @param repository product repository
+     * @param mapper     product mapper
+     */
     public ProductServiceImpl(ProductRepository repository, ProductMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ProductResponseDto create(ProductCreateDto dto) {
         log.debug("Creating product: name={} price={}", dto.getName(), dto.getPrice());
@@ -39,6 +52,9 @@ public class ProductServiceImpl implements ProductService {
         return mapper.toDto(saved);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public ProductResponseDto getById(Long id) {
@@ -49,6 +65,9 @@ public class ProductServiceImpl implements ProductService {
         return mapper.toDto(p);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponseDto> getAll() {
@@ -57,6 +76,9 @@ public class ProductServiceImpl implements ProductService {
         return list;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ProductResponseDto update(Long id, ProductUpdateDto dto) {
         Product existing = repository.findById(id).orElseThrow(() -> {
@@ -70,6 +92,9 @@ public class ProductServiceImpl implements ProductService {
         return mapper.toDto(saved);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(Long id) {
         if (!repository.existsById(id)) {

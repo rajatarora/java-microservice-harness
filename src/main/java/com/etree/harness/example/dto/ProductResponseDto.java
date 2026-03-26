@@ -10,6 +10,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+/**
+ * DTO returned from API endpoints representing a product resource including
+ * audit metadata.
+ */
 public class ProductResponseDto {
 
     private Long id;
