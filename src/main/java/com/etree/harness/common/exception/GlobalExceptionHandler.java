@@ -59,15 +59,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Overload used by tests and direct calls to map constraint violations to a
-     * bad request response.
-     */
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex) {
-        return handleConstraintViolation(ex, null);
-    }
-
-    /**
      * Handle {@link ConstraintViolationException} produced by parameter or
      * other validation and return a 400 containing the violation messages.
      */

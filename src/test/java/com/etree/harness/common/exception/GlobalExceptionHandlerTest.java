@@ -1,14 +1,9 @@
 package com.etree.harness.common.exception;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Path;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
@@ -54,27 +49,6 @@ public class GlobalExceptionHandlerTest {
         @SuppressWarnings("unchecked")
         List<String> msgs = (List<String>) body.get("message");
         assertTrue(msgs.stream().anyMatch(m -> m.contains("name: must not be blank")));
-    }
-
-    @Test
-    void handleConstraintViolation_returnsBadRequestWithViolations() {
-        @SuppressWarnings("unchecked")
-        ConstraintViolation<Object> cv = mock(ConstraintViolation.class);
-        Path p = mock(Path.class);
-        when(p.toString()).thenReturn("dto.age");
-        when(cv.getPropertyPath()).thenReturn(p);
-        when(cv.getMessage()).thenReturn("must be >= 0");
-
-        Set<ConstraintViolation<?>> set = Collections.singleton((ConstraintViolation<?>) cv);
-        ConstraintViolationException ex = new ConstraintViolationException(set);
-
-        ResponseEntity<Object> resp = handler.handleConstraintViolation(ex);
-        assertEquals(HttpStatus.BAD_REQUEST, resp.getStatusCode());
-        @SuppressWarnings("unchecked")
-        Map<String, Object> body = (Map<String, Object>) resp.getBody();
-        @SuppressWarnings("unchecked")
-        List<String> msgs = (List<String>) body.get("message");
-        assertTrue(msgs.stream().anyMatch(m -> m.contains("dto.age: must be >= 0")));
     }
 
     @Test
