@@ -69,7 +69,7 @@ public class ProductController {
 
     @PatchMapping("/{id}")
     @Operation(summary = "Partially update a product")
-    public ResponseEntity<ProductResponseDto> patch(@PathVariable Long id, @RequestBody ProductUpdateDto dto) {
+    public ResponseEntity<ProductResponseDto> patch(@PathVariable Long id, @Valid @RequestBody ProductUpdateDto dto) {
         ProductResponseDto updated = service.update(id, dto);
         return ResponseEntity.ok(updated);
     }
