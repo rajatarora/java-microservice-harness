@@ -23,8 +23,10 @@ import com.etree.harness.example.service.ProductService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/products")
 @Tag(name = "Products")
 public class ProductController {
@@ -38,20 +40,28 @@ public class ProductController {
     @PostMapping
     @Operation(summary = "Create a product")
     public ResponseEntity<ProductResponseDto> create(@Valid @RequestBody ProductCreateDto dto) {
+        log.info("Create product request received: name={} price={}", dto.getName(), dto.getPrice());
         ProductResponseDto created = service.create(dto);
+        log.info("Product created: id={}", created.getId());
         return ResponseEntity.created(URI.create("/api/v1/products/" + created.getId())).body(created);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a product by id")
     public ResponseEntity<ProductResponseDto> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
+        log.debug("Get product by id request: id={}", id);
+        ProductResponseDto resp = service.getById(id);
+        log.debug("Get product by id response: id={}", resp.getId());
+        return ResponseEntity.ok(resp);
     }
 
     @GetMapping
     @Operation(summary = "List all products")
     public ResponseEntity<List<ProductResponseDto>> getAll() {
-        return ResponseEntity.ok(service.getAll());
+        log.debug("Get all products request");
+        var list = service.getAll();
+        log.debug("Get all products response: count={}", list.size());
+        return ResponseEntity.ok(list);
     }
 
     @PutMapping("/{id}")
@@ -63,21 +73,27 @@ public class ProductController {
         update.setDescription(dto.getDescription());
         update.setPrice(dto.getPrice());
         update.setStock(dto.getStock());
+        log.info("Replace product request: id={}", id);
         ProductResponseDto updated = service.update(id, update);
+        log.info("Product replaced: id={}", updated.getId());
         return ResponseEntity.ok(updated);
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Partially update a product")
     public ResponseEntity<ProductResponseDto> patch(@PathVariable Long id, @Valid @RequestBody ProductUpdateDto dto) {
+        log.info("Patch product request: id={} fields={}", id, dto);
         ProductResponseDto updated = service.update(id, dto);
+        log.info("Product patched: id={}", updated.getId());
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a product")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("Delete product request: id={}", id);
         service.delete(id);
+        log.info("Product deleted: id={}", id);
         return ResponseEntity.noContent().build();
     }
 

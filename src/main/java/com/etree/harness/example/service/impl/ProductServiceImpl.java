@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 import com.etree.harness.example.dto.ProductCreateDto;
 import com.etree.harness.example.dto.ProductResponseDto;
@@ -18,6 +19,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository repository;
@@ -30,39 +32,52 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDto create(ProductCreateDto dto) {
+        log.debug("Creating product: name={} price={}", dto.getName(), dto.getPrice());
         Product entity = mapper.toEntity(dto);
         Product saved = repository.save(entity);
+        log.info("Product saved: id={}", saved.getId());
         return mapper.toDto(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProductResponseDto getById(Long id) {
-        Product p = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found: " + id));
+        Product p = repository.findById(id).orElseThrow(() -> {
+            log.warn("Product not found: id={}", id);
+            return new EntityNotFoundException("Product not found: " + id);
+        });
         return mapper.toDto(p);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponseDto> getAll() {
-        return repository.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
+        var list = repository.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
+        log.debug("Retrieved products: count={}", list.size());
+        return list;
     }
 
     @Override
     public ProductResponseDto update(Long id, ProductUpdateDto dto) {
-        Product existing = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found: " + id));
+        Product existing = repository.findById(id).orElseThrow(() -> {
+            log.warn("Product not found for update: id={}", id);
+            return new EntityNotFoundException("Product not found: " + id);
+        });
+        log.debug("Updating product: id={}", id);
         mapper.updateFromDto(dto, existing);
         Product saved = repository.save(existing);
+        log.info("Product updated: id={}", saved.getId());
         return mapper.toDto(saved);
     }
 
     @Override
     public void delete(Long id) {
         if (!repository.existsById(id)) {
+            log.warn("Delete requested for non-existent product: id={}", id);
             throw new EntityNotFoundException("Product not found: " + id);
         }
         repository.deleteById(id);
+        log.info("Deleted product: id={}", id);
     }
 
 }
