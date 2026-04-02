@@ -1,0 +1,8 @@
+target/
+.m2/
+.git/
+*.log
+**/node_modules
+build/
+/.idea
+/.vscode

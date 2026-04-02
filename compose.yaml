@@ -3,8 +3,9 @@ services:
     image: 'grafana/otel-lgtm:latest'
     ports:
       - '3000:3000'
-      - '4317'
-      - '4318'
+      - '4317:4317'
+      - '4318:4318'
+
   postgres:
     image: 'postgres:latest'
     environment:
@@ -12,4 +13,33 @@ services:
       - 'POSTGRES_PASSWORD=secret'
       - 'POSTGRES_USER=myuser'
     ports:
-      - '5432'
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: harness:jar
+    depends_on:
+      - grafana-lgtm
+      - postgres
+    ports:
+      - '8080:8080'
+      - '8081:8081'
+    environment:
+      # Point OTLP metrics export to the collector service inside the compose network
+      - MANAGEMENT_METRICS_EXPORT_OTLP_ENDPOINT=http://grafana-lgtm:4318/v1/metrics
+      # OpenTelemetry canonical env vars (picked up by OTLP exporters)
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana-lgtm:4318
+      - OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://grafana-lgtm:4318/v1/metrics
+      # Database connection - adjust if your app expects different names
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydatabase
+      - SPRING_DATASOURCE_USERNAME=myuser
+      - SPRING_DATASOURCE_PASSWORD=secret
+      # Ensure the correct driver is used for Postgres (application.yaml defaults to H2 driver)
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+
+volumes:
+  db-data:
